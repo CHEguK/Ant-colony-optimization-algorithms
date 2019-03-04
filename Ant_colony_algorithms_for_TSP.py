@@ -4,17 +4,16 @@ from numpy.random import choice as np_choice
 
 
 class AntColony(object):
-	def __init__(self, distances, num_ants, num_interations, start_city, decay, alpha=1, beta=1):
+	def __init__(self, distances, num_ants, num_interations, decay, alpha=1, beta=1):
 		
-		self.distances = distances										# Матрица расстояний
-		self.pheromone = np.ones(self.distances.shape) / len(distances)	# Матрица феромонов
+		self.distances = distances								# Матрица расстояний
+		self.pheromone = np.ones(self.distances.shape) / len(distances)				# Матрица феромонов
 		self.all_city = range(len(distances))							# Все города
-		self.num_ants = num_ants										# Количество муравьёв
+		self.num_ants = num_ants								# Количество муравьёв
 		self.num_interations = num_interations							# Кол-во интераций
-		self.decay = decay												# Коэффициент испарения
-		self.alpha = alpha												# alpha
-		self.beta = beta												# betta
-		self.start_city = start_city									# Начальный город
+		self.decay = decay									# Коэффициент испарения
+		self.alpha = alpha									# alpha
+		self.beta = beta									# betta
     
     def run(self):
         shortest_way = None
@@ -53,7 +52,7 @@ class AntColony(object):
 	def gen_all_route(self):
 		all_route = []
 		for i in range(self.num_ants):
-			way = self.gen_way(self.start_city)					#rn.randrange(0, len(self.distances))
+			way = self.gen_way(0)					#rn.randrange(0, len(self.distances))
 			all_route.append((way, self.gen_path_dist(way)))
 		return all_route
 		
@@ -112,7 +111,7 @@ for p in range(len(distances)):
 	j+=1
 
 
-ant_colony = AntColony(distances, 5, 100, 0.95, 0, alpha=1, beta=2)
+ant_colony = AntColony(distances, 5, 100, 0.95, alpha=1, beta=2)
 shortest_path = ant_colony.run()
 sys.stdout.write(str(shortest_path))
 

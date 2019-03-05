@@ -6,16 +6,16 @@ from numpy.random import choice as np_choice
 class AntColony(object):
 	def __init__(self, distances, num_ants, num_interations, decay, alpha=1, beta=1):
 		
-		self.distances = distances										# Матрица расстояний
-		self.pheromone = np.ones(self.distances.shape) / len(distances)	# Матрица феромонов
+		self.distances = distances								# Матрица расстояний
+		self.pheromone = np.ones(self.distances.shape) / len(distances)				# Матрица феромонов
 		self.all_city = range(len(distances))							# Все города
-		self.num_ants = num_ants										# Количество муравьёв	(int)
-		self.num_interations = num_interations							# Кол-во интераций		(int)
-		self.decay = decay												# Коэффициент испарения	(float)
-		self.alpha = alpha												# alpha					(float)
-		self.beta = beta												# betta					(float)
-    
-	def run(self):									# Основная функция
+		self.num_ants = num_ants								# Количество муравьёв (int)
+		self.num_interations = num_interations							# Кол-во интераций (int)
+		self.decay = decay									# Коэффициент испарения (float)
+		self.alpha = alpha									# alpha	(float)
+		self.beta = beta									# betta	(float)
+    	# Основная функция
+	def run(self):
 		shortest_way = None
 		all_time_shortest_way = ("route", np.inf)
 		for i in range(self.num_interations):
@@ -26,31 +26,34 @@ class AntColony(object):
 			
 			if (shortest_way[1] < all_time_shortest_way[1]):	#Нахождение самого короткого пути
 				all_time_shortest_way = shortest_way
-			self.pheromone * self.decay							#Испарение феромонов
+			self.pheromone * self.decay			#Испарение феромонов
 		
 		return all_time_shortest_way[1]
 	
-	def distribution_pheromone(self, all_route, num_ants, shortest_way):	# Добавление феромонов на участки по которым пробегали муравьи 
-		sorted_way = sorted(all_route, key=lambda x: x[1])						# Вход: (Все маршруты муравьёв в этой итерации, количество муравьёв, кротчайший путь)
+	# Добавление феромонов на участки по которым пробегали муравьи
+	def distribution_pheromone(self, all_route, num_ants, shortest_way):	 
+		sorted_way = sorted(all_route, key=lambda x: x[1])		# Вход: (Все маршруты муравьёв в этой итерации, количество муравьёв, кротчайший путь)
 		for way, dist in sorted_way[:num_ants]:
 			for move in way:
 				self.pheromone[move] += 1/self.distances[move]
 				
-	
-	def gen_path_dist(self, way):					# Считает длину пути муравья Вход:(Маршрут муравья)
+	# Считает длину пути муравья Вход:(Маршрут муравья)
+	def gen_path_dist(self, way):					
 		total_distance = 0
 		for l in way:
 			 total_distance += self.distances[l]
-		return total_distance						# Выход: (Длина маршрута)
+		return total_distance				# Выход: (Длина маршрута)
 	
-	def gen_all_route(self):						# Формируем маршруты всех муравёв
+	# Формируем маршруты всех муравёв
+	def gen_all_route(self):						
 		all_route = []
 		for i in range(self.num_ants):
 			way = self.gen_way(0)			# Город отправления.       Чтобы город отправления ждя каждого муравья выбирался рандомно: rn.randrange(0, len(self.distances))
 			all_route.append((way, self.gen_path_dist(way)))
-		return all_route							# Выход: (список маршрутов всех муравьёв и его длина)
-		
-	def gen_way(self, start):						# Формируем муршрут каждого муравья						
+		return all_route				# Выход: (список маршрутов всех муравьёв и его длина)
+	
+	# Формируем муршрут каждого муравья	
+	def gen_way(self, start):												
 		way = []
 		visited = set()
 		visited.add(start)
@@ -60,14 +63,15 @@ class AntColony(object):
 			way.append((prev, move))
 			prev = move
 			visited.add(move)
-		way.append((prev, start))			# Возврат в начальную точку
-		return way									# Выход: (список маршрута муравья)
-		
-	def pick_move(self, pheromone, dist, visited):	# Функция выбора следующего города Вход: ( Массив феромонов в следующие города, Массив расстояний до след городов, кортеж с первым городом)
+		way.append((prev, start))	# Возврат в начальную точку
+		return way				# Выход: (список маршрута муравья)
+	
+	# Функция выбора следующего города Вход: ( Массив феромонов в следующие города, Массив расстояний до след городов, кортеж с первым городом)	
+	def pick_move(self, pheromone, dist, visited):
 		pheromone = np.copy(pheromone)
 		pheromone[list(visited)] = 0
 		
-		choice = pheromone ** self.alpha * ((1.0/dist) ** self.beta)		# Вероятность перехода из вершины i в вершину j 
+		choice = pheromone ** self.alpha * ((1.0/dist) ** self.beta)	# Вероятность перехода из вершины i в вершину j 
 		
 		norm_choice = choice / choice.sum()		# Нормирование
 		
@@ -86,14 +90,13 @@ distances = np.array([[0, 2, 30, 9, 1],
                      [20, 13, 16, 0, 28],
                     [9, 36, 22, 22, 0]])
 
+# Вход через stdin
 #a = sys.stdin.read()
 #list_of_lists=[]
-
 #for line in a.split('\n'):
 #    new_list = [int(elem) for elem in line.split()]
 #    list_of_lists.append(new_list)
 #del list_of_lists[-1]
-
 #distances = np.array(list_of_lists)
 
 i=0
@@ -106,7 +109,7 @@ for p in range(len(distances)):
 
 
 ant_colony = AntColony(distances, 5, 100, 0.95, alpha=1, beta=2)	# Запуск алгоритма
-shortest_path = ant_colony.run()									# Получение самого короткого пути
+shortest_path = ant_colony.run()		# Получение самого короткого пути
 sys.stdout.write(str(shortest_path))
 
 
